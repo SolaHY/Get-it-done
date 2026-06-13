@@ -1,5 +1,6 @@
 import './style.css'
 import type { AppState, Note, QuickLink, Tab, Task } from './types'
+import { loadTechNews, renderNewsPage } from './tech-news'
 import { loadState, mergeDefaultLinks, saveState } from './storage'
 import {
   escapeHtml,
@@ -20,6 +21,9 @@ let state: AppState = {
   taskFilter: 'active',
   noteSearch: '',
   selectedNoteId: null,
+  newsFeed: null,
+  newsLoading: false,
+  newsError: null,
 }
 
 const app = document.querySelector<HTMLDivElement>('#app')!
@@ -30,7 +34,32 @@ function persist(): void {
 
 function setTab(tab: Tab): void {
   state.activeTab = tab
+  if (tab === 'news') {
+    void ensureNewsLoaded()
+    return
+  }
   render()
+}
+
+async function ensureNewsLoaded(force = false): Promise<void> {
+  if (state.newsLoading) return
+  if (!force && state.newsFeed) {
+    render()
+    return
+  }
+
+  state.newsLoading = true
+  state.newsError = null
+  render()
+
+  try {
+    state.newsFeed = await loadTechNews()
+  } catch (error) {
+    state.newsError = error instanceof Error ? error.message : 'ニュースの取得に失敗しました'
+  } finally {
+    state.newsLoading = false
+    render()
+  }
 }
 
 function addTask(title: string, priority: Task['priority'], dueDate?: string, description?: string): void {
@@ -125,6 +154,7 @@ const NAV_ICONS: Record<Tab, string> = {
   home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>`,
   tasks: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
   notes: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>`,
+  news: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>`,
 }
 
 function getGreeting(): string {
@@ -159,6 +189,7 @@ function renderSidebar(): string {
     { id: 'home', label: 'ホーム' },
     { id: 'tasks', label: 'タスク' },
     { id: 'notes', label: 'ナレッジ' },
+    { id: 'news', label: 'テックニュース' },
   ]
 
   const activeTasks = state.tasks.filter((t) => !t.completed).length
@@ -472,7 +503,9 @@ function render(): void {
       ? renderHome()
       : state.activeTab === 'tasks'
         ? renderTasks()
-        : renderNotes()
+        : state.activeTab === 'notes'
+          ? renderNotes()
+          : renderNewsPage(state.newsFeed, state.newsLoading, state.newsError)
 
   app.innerHTML = `
     <div class="layout">
@@ -494,6 +527,7 @@ function bindEvents(): void {
   if (state.activeTab === 'home') bindHomeEvents()
   if (state.activeTab === 'tasks') bindTaskEvents()
   if (state.activeTab === 'notes') bindNoteEvents()
+  if (state.activeTab === 'news') bindNewsEvents()
 }
 
 function bindHomeEvents(): void {
@@ -609,6 +643,12 @@ function bindNoteEvents(): void {
     if (confirm('このメモを削除しますか？')) {
       deleteNote(state.selectedNoteId)
     }
+  })
+}
+
+function bindNewsEvents(): void {
+  document.getElementById('reload-news-btn')?.addEventListener('click', () => {
+    void ensureNewsLoaded(true)
   })
 }
 

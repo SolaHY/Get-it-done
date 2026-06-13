@@ -27,7 +27,30 @@ export interface Note {
   updatedAt: string
 }
 
-export type Tab = 'home' | 'tasks' | 'notes'
+export interface TechNewsItem {
+  id: string
+  title: string
+  url: string
+  source: string
+  category?: string
+  summary: string
+  publishedAt: string
+  score: number
+}
+
+export interface TechNewsFeed {
+  fetchedAt: string
+  weekLabel: string
+  weekStart: string
+  weekEnd: string
+  retentionDays?: number
+  maxArticles?: number
+  articleCount: number
+  articles: TechNewsItem[]
+  errors?: string[]
+}
+
+export type Tab = 'home' | 'tasks' | 'notes' | 'news'
 
 export interface AppState {
   links: QuickLink[]
@@ -37,4 +60,7 @@ export interface AppState {
   taskFilter: 'all' | 'active' | 'completed'
   noteSearch: string
   selectedNoteId: string | null
+  newsFeed: TechNewsFeed | null
+  newsLoading: boolean
+  newsError: string | null
 }
