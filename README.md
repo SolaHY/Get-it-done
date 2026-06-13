@@ -10,12 +10,20 @@
 
 ## 起動方法
 
+### ローカル開発
+
 ```bash
 npm install
 npm run dev
 ```
 
 ブラウザで http://localhost:5173 を開いてください。
+
+### GitHub Pages（公開URL）
+
+https://solahy.github.io/Get-it-done/
+
+`main` ブランチへの push で自動デプロイされます。
 
 ## データ保存
 
