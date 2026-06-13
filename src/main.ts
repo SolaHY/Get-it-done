@@ -1,6 +1,6 @@
 import './style.css'
 import type { AppState, Note, QuickLink, Tab, Task } from './types'
-import { DEFAULT_LINKS, loadState, saveState } from './storage'
+import { loadState, mergeDefaultLinks, saveState } from './storage'
 import {
   escapeHtml,
   formatDate,
@@ -13,7 +13,7 @@ import {
 const saved = loadState()
 
 let state: AppState = {
-  links: saved.links ?? [...DEFAULT_LINKS],
+  links: mergeDefaultLinks(saved.links),
   tasks: saved.tasks ?? [],
   notes: saved.notes ?? [],
   activeTab: 'home',

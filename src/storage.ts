@@ -12,6 +12,14 @@ export const DEFAULT_LINKS: QuickLink[] = [
     category: 'プロジェクト管理',
   },
   {
+    id: 'thenewgate-github',
+    title: 'TheNewGate GitHub',
+    url: 'https://github.com/thenewgate-inc',
+    description: '株式会社TheNewGate GitHub Organization',
+    icon: '🐙',
+    category: 'プロジェクト管理',
+  },
+  {
     id: 'cytech-manual',
     title: 'CyTech IR 運用マニュアル',
     url: 'https://cytech-education.github.io/CyTech-Div-Manual/',
@@ -52,6 +60,18 @@ export const DEFAULT_LINKS: QuickLink[] = [
     category: 'Salesforce',
   },
 ]
+
+const DEFAULT_LINK_MAP = new Map(DEFAULT_LINKS.map((link) => [link.id, link]))
+
+export function mergeDefaultLinks(savedLinks?: QuickLink[]): QuickLink[] {
+  const customLinks = (savedLinks ?? []).filter((link) => !DEFAULT_LINK_MAP.has(link.id))
+  const mergedDefaults = DEFAULT_LINKS.map((defaultLink) => {
+    const saved = savedLinks?.find((link) => link.id === defaultLink.id)
+    return saved ? { ...saved, ...defaultLink } : defaultLink
+  })
+
+  return [...mergedDefaults, ...customLinks]
+}
 
 export function loadState(): Partial<AppState> {
   try {

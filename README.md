@@ -37,3 +37,4 @@ https://solahy.github.io/Get-it-done/
 - CyTech Engineer 管理
 - Salesforce（本番）
 - Salesforce（Staging）
+- [TheNewGate GitHub](https://github.com/thenewgate-inc)
