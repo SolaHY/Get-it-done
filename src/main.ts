@@ -169,6 +169,7 @@ function getCategoryClass(category: string): string {
   if (category.includes('ドキュメント')) return 'cat-doc'
   if (category.toLowerCase().includes('cytech')) return 'cat-cytech'
   if (category.toLowerCase().includes('salesforce')) return 'cat-salesforce'
+  if (category.includes('学習')) return 'cat-learning'
   return 'cat-other'
 }
 
@@ -179,6 +180,7 @@ function getCategoryDot(category: string): string {
     'cat-doc': '#a855f7',
     'cat-cytech': '#4fd1ff',
     'cat-salesforce': '#6366f1',
+    'cat-learning': '#22c55e',
     'cat-other': '#7c6cff',
   }
   return colors[cls] ?? colors['cat-other']

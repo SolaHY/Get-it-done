@@ -820,6 +820,9 @@ textarea {
 .link-card.cat-salesforce::before {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), transparent);
 }
+.link-card.cat-learning::before {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), transparent);
+}
 .link-card.cat-other::before {
   background: linear-gradient(135deg, rgba(124, 108, 255, 0.06), transparent);
 }
@@ -868,6 +871,10 @@ textarea {
 .cat-salesforce .link-icon-wrap {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
   border: 1px solid rgba(99, 102, 241, 0.2);
+}
+.cat-learning .link-icon-wrap {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 .cat-other .link-icon-wrap {
   background: linear-gradient(135deg, rgba(124, 108, 255, 0.2), rgba(124, 108, 255, 0.05));

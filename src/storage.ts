@@ -59,6 +59,30 @@ export const DEFAULT_LINKS: QuickLink[] = [
     icon: '🧪',
     category: 'Salesforce',
   },
+  {
+    id: 'salesforce-learner',
+    title: 'Salesforce Learner',
+    url: 'https://solahy.github.io/Salesforce-learner/',
+    description: 'Salesforce 学習用アプリ',
+    icon: '🎓',
+    category: '学習',
+  },
+  {
+    id: 'tng-learning',
+    title: 'TNG Learning',
+    url: 'https://thenewgate-inc.github.io/tng-its/tng-learning/',
+    description: 'TNG 学習コンテンツ',
+    icon: '📚',
+    category: '学習',
+  },
+  {
+    id: 'learning-app',
+    title: 'Learning App',
+    url: 'https://learning-app-836760798728.asia-northeast1.run.app/',
+    description: '学習用アプリ',
+    icon: '🧠',
+    category: '学習',
+  },
 ]
 
 const DEFAULT_LINK_MAP = new Map(DEFAULT_LINKS.map((link) => [link.id, link]))
