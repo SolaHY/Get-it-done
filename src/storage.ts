@@ -83,6 +83,14 @@ export const DEFAULT_LINKS: QuickLink[] = [
     icon: '🧠',
     category: '学習',
   },
+  {
+    id: 'data-engineer-master',
+    title: 'Data Engineer Master',
+    url: 'https://solahy.github.io/Data-Engineer-Master/',
+    description: 'データエンジニア学習用アプリ',
+    icon: '🗄️',
+    category: '学習',
+  },
 ]
 
 const DEFAULT_LINK_MAP = new Map(DEFAULT_LINKS.map((link) => [link.id, link]))
