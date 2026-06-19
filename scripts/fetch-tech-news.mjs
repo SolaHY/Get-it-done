@@ -8,6 +8,8 @@ const OUT_PATH = join(__dirname, '../public/data/tech-news.json')
 // 保持ポリシー: ファイルは毎回上書き。過去データは残さない。
 const RETENTION_DAYS = 7
 const MAX_ARTICLES = 30
+// AI活用記事を優先的に確保する枠数(残りは一般のテック記事で埋める)
+const AI_PRIORITY_SLOTS = 22
 
 const WEEK_SECONDS = RETENTION_DAYS * 24 * 60 * 60
 const weekAgoUnix = Math.floor(Date.now() / 1000) - WEEK_SECONDS
@@ -31,7 +33,7 @@ function getWeekRange() {
   return { start: fmt(start), end: fmt(end), label: `${fmt(start)} – ${fmt(end)}` }
 }
 
-async function fetchHackerNews(query, limit = 10) {
+async function fetchHackerNews(query, limit = 10, category = 'Industry') {
   const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&numericFilters=created_at_i>${weekAgoUnix}&hitsPerPage=${limit}`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Hacker News request failed: ${query}`)
@@ -42,17 +44,31 @@ async function fetchHackerNews(query, limit = 10) {
     title: hit.title,
     url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
     source: 'Hacker News',
-    category: 'Industry',
+    category,
     summary: `${hit.points ?? 0} points · ${hit.num_comments ?? 0} comments`,
     publishedAt: new Date(hit.created_at).toISOString(),
     score: hit.points ?? 0,
   }))
 }
 
-async function fetchDevToTag(tag, limit = 8) {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+async function fetchWithRetry(url, options, label, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const res = await fetch(url, options)
+    if (res.ok) return res
+    // レート制限などの一時的なエラーはバックオフして再試行
+    if (attempt < retries && (res.status === 429 || res.status >= 500)) {
+      await sleep(500 * (attempt + 1))
+      continue
+    }
+    throw new Error(`${label} request failed: ${res.status}`)
+  }
+}
+
+async function fetchDevToTag(tag, limit = 8, category = 'Tutorial') {
   const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&per_page=${limit}`
-  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
-  if (!res.ok) throw new Error(`Dev.to request failed: ${tag}`)
+  const res = await fetchWithRetry(url, { headers: { 'User-Agent': USER_AGENT } }, `Dev.to ${tag}`)
 
   const data = await res.json()
   const label = tag.charAt(0).toUpperCase() + tag.slice(1)
@@ -64,7 +80,7 @@ async function fetchDevToTag(tag, limit = 8) {
       title: article.title,
       url: article.url,
       source: `Dev.to · ${label}`,
-      category: 'Tutorial',
+      category,
       summary: article.description
         ? `${article.description.slice(0, 140).trim()}…`
         : `${article.positive_reactions_count ?? 0} reactions · ${article.comments_count ?? 0} comments`,
@@ -128,14 +144,38 @@ function dedupeAndSort(items) {
     unique.push(item)
   }
 
-  return unique
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, MAX_ARTICLES)
+  const byDate = (a, b) =>
+    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+
+  const aiItems = unique.filter((item) => item.category === 'AI活用').sort(byDate)
+  const otherItems = unique.filter((item) => item.category !== 'AI活用').sort(byDate)
+
+  // AI活用を最優先(最大 AI_PRIORITY_SLOTS 件)。残り枠は一般のテック記事で埋める。
+  const ai = aiItems.slice(0, AI_PRIORITY_SLOTS)
+  const remaining = MAX_ARTICLES - ai.length
+  const others = otherItems.slice(0, remaining)
+
+  // AI枠が埋まりきらない場合は、余ったAI記事も後ろに追加する。
+  const filler = aiItems.slice(AI_PRIORITY_SLOTS, AI_PRIORITY_SLOTS + (remaining - others.length))
+
+  return [...ai, ...others, ...filler].slice(0, MAX_ARTICLES)
 }
 
 async function main() {
   const week = getWeekRange()
   const results = await Promise.allSettled([
+    // AI活用・Claude Code・AIエージェントを従業員として使う系
+    fetchHackerNews('Claude Code', 10, 'AI活用'),
+    fetchHackerNews('AI agents', 10, 'AI活用'),
+    fetchHackerNews('AI coding assistant', 10, 'AI活用'),
+    fetchHackerNews('LLM workflow', 8, 'AI活用'),
+    fetchHackerNews('AI automation', 8, 'AI活用'),
+    fetchDevToTag('ai', 10, 'AI活用'),
+    fetchDevToTag('llm', 8, 'AI活用'),
+    fetchDevToTag('agents', 8, 'AI活用'),
+    fetchDevToTag('chatgpt', 6, 'AI活用'),
+    fetchDevToTag('copilot', 6, 'AI活用'),
+    // 一般のテック・エンジニアリング系
     fetchHackerNews('programming'),
     fetchHackerNews('software engineering'),
     fetchHackerNews('typescript'),

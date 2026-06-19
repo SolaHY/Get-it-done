@@ -27,7 +27,7 @@ export function renderNewsPage(
     <div class="page-header">
       <div>
         <h2>テックニュース</h2>
-        <p>スキルと知識が身につくテック記事を毎週ピックアップ</p>
+        <p>AI活用・Claude Code・AIエージェント運用を中心にテック記事を毎週ピックアップ</p>
       </div>
       ${loading ? '' : `<button class="btn btn-secondary" id="reload-news-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
@@ -92,7 +92,7 @@ export function renderNewsPage(
         <a href="${escapeHtml(article.url)}" target="_blank" rel="noopener noreferrer" class="news-card">
           <div class="news-card-header">
             <span class="source-chip ${sourceClass(article.source)}">${escapeHtml(article.source)}</span>
-            ${article.category ? `<span class="news-category">${escapeHtml(article.category)}</span>` : ''}
+            ${article.category ? `<span class="news-category${article.category === 'AI活用' ? ' news-category-ai' : ''}">${escapeHtml(article.category)}</span>` : ''}
             <span class="news-date">${formatDateTime(article.publishedAt)}</span>
           </div>
           <h3 class="news-title">${escapeHtml(article.title)}</h3>
@@ -107,6 +107,6 @@ export function renderNewsPage(
         .join('')}
     </div>
 
-    <p class="news-footer-note">毎週月曜 0:00 UTC に自動更新 · プログラミング・エンジニアリング・キャリア系の記事を収集</p>
+    <p class="news-footer-note">毎週月曜 0:00 UTC に自動更新 · AI活用・Claude Code・AIエージェント運用とエンジニアリング系の記事を収集</p>
   `
 }
