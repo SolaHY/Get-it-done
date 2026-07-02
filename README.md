@@ -82,8 +82,8 @@ npm run fetch:news
 
 - Backlog
 - CyTech IR 運用マニュアル
-- CyTech Dashboard
-- CyTech Engineer 管理
+- 新CT管理画面
+- 旧CT管理画面
 - Salesforce（本番）
 - Salesforce（Staging）
 - [TheNewGate GitHub](https://github.com/thenewgate-inc)

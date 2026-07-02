@@ -29,7 +29,7 @@ export const DEFAULT_LINKS: QuickLink[] = [
   },
   {
     id: 'cytech-dashboard',
-    title: 'CyTech Dashboard',
+    title: '新CT管理画面',
     url: 'https://tng-cytech-dashboard.com/home',
     description: 'CyTech ダッシュボード',
     icon: '📊',
@@ -37,7 +37,7 @@ export const DEFAULT_LINKS: QuickLink[] = [
   },
   {
     id: 'cytech-engineer',
-    title: 'CyTech Engineer 管理',
+    title: '旧CT管理画面',
     url: 'https://engineer.cytech.online/admin/login',
     description: 'エンジニアマスター管理',
     icon: '⚙️',

@@ -856,6 +856,11 @@ textarea {
   transform: scale(1.08) rotate(-3deg);
 }
 
+.link-icon-wrap .brand-icon {
+  width: 28px;
+  height: 28px;
+}
+
 .cat-project .link-icon-wrap {
   background: linear-gradient(135deg, rgba(79, 143, 255, 0.2), rgba(79, 143, 255, 0.05));
   border: 1px solid rgba(79, 143, 255, 0.2);
